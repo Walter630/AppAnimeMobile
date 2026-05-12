@@ -30,20 +30,6 @@ fun AppNavegation() {
                 aoClicarParaVoltar = {
                     // Dizemos ao motorista para remover a tela atual da pilha e voltar
                     navController.popBackStack()
-                },
-                aoClicarAnime = { tituloClicado ->
-                    navController.navigate("detalhes/$tituloClicado")
-                }
-            )
-        }
-
-        composable("detalhes/$tituloClicado") { backStackEntry ->
-            val titulo = backStackEntry.arguments?.getString("nomeAnime")
-
-            TelaInformationAnime(
-                tituloAnime = titulo?: "",
-                aoClicarParaVoltar = {
-                    navController.popBackStack()
                 }
             )
         }

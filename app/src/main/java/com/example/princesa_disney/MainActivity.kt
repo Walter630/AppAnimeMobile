@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TelaHome(aoClicarParaVoltar: () -> Unit, aoClicarAnime: () -> Unit) {
+fun TelaHome(aoClicarParaVoltar: () -> Unit) {
     val listaAnimes = listOf(
         Anime(
             "Naruto",
@@ -171,8 +171,7 @@ fun CardAnime(anime: Anime) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp)
-            .clickable { aoClicarAnime(anime.titulo) },
+            .padding(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
 
     ) {
