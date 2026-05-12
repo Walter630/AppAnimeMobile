@@ -28,7 +28,7 @@ fun AppNavegation() {
         composable("main") {
             TelaHome(
                 aoClicarParaVoltar = {
-                    // Dizemos ao motorista para remover a tela atual da pilha e voltar
+                    // Dizemos ao motorista para remover a tela atual da  pilha e voltar
                     navController.popBackStack()
                 }
             )
