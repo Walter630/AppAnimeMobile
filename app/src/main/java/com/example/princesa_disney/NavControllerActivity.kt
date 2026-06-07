@@ -4,8 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.princesa_disney.telas.LoginActivity
-import com.example.princesa_disney.telas.TelaInformationAnime
+
 import com.example.princesa_disney.telas.TelaLogin
 
 @Composable
