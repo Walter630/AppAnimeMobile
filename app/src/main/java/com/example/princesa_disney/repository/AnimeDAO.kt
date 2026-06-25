@@ -10,22 +10,23 @@ import com.example.princesa_disney.entity.Anime
 @Dao
 interface AnimeDAO {
     @Insert
-    fun insert(anime: List<Anime>)
+    suspend fun insert(anime: List<Anime>): List<Long>
+
     @Insert
-    fun insertSingle(anime: Anime): Long
+    suspend fun insertSingle(anime: Anime): Long
 
     @Query("SELECT * FROM Anime")
-    fun getAllAnime(): List<Anime>
+    suspend fun getAllAnime(): List<Anime>
 
     @Query("SELECT * FROM Anime WHERE id = :id")
-    fun getAnimeId(id: Int): Anime
+    suspend fun getAnimeId(id: Int): Anime
 
     @Query("SELECT * FROM Anime WHERE favorite = 1")
-    fun getFavoriteAnime(): List<Anime>
+    suspend fun getFavoriteAnime(): List<Anime>
 
     @Update
-    fun update(anime: Anime)
+    suspend fun update(anime: Anime): Int
 
     @Delete
-    fun deleteAnime(anime: Anime): Int
+    suspend fun deleteAnime(anime: Anime): Int
 }

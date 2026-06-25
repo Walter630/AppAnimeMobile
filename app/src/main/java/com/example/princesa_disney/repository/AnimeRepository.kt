@@ -106,26 +106,30 @@ class AnimeRepository private constructor(context: Context) {
         )
     }
 
-    fun loadInitialData() {
+    suspend fun loadInitialData() {
         val animes = getInitialAnime()
         dataBase.insert(animes)
     }
 
-    fun getAllAnime(): List<Anime> {
+    suspend fun getAllAnime(): List<Anime> {
         return dataBase.getAllAnime()
     }
 
-    fun getFavoriteAnime(): List<Anime> {
+    suspend fun getFavoriteAnime(): List<Anime> {
         return dataBase.getFavoriteAnime()
     }
-    fun insertAnime(anime: Anime): Boolean = dataBase.insertSingle(anime) > 0  // ← NOVO
-    fun getAnimeId(id: Int): Anime {
+
+    suspend fun insertAnime(anime: Anime): Boolean = dataBase.insertSingle(anime) > 0
+
+    suspend fun getAnimeId(id: Int): Anime {
         return dataBase.getAnimeId(id)
     }
-    fun updateAnime(anime: Anime) {
-        return dataBase.update(anime)
+
+    suspend fun updateAnime(anime: Anime): Boolean {
+        return dataBase.update(anime) > 0
     }
-    fun deleteAnime(id: Int): Boolean {
+
+    suspend fun deleteAnime(id: Int): Boolean {
         return dataBase.deleteAnime(getAnimeId(id)) > 0
     }
 

@@ -21,16 +21,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.princesa_disney.apiExterna.AnimeApiDto
 import com.example.princesa_disney.entity.Anime
 import com.example.princesa_disney.ui.theme.Princesa_DisneyTheme
+import com.example.princesa_disney.view.DescobrirViewModel
 import com.example.princesa_disney.view.HomeViewModel
+import com.example.princesa_disney.view.LoginViewModel
 
 // ── Paleta de cores ───────────────────────────────────────
 private val DarkBg       = Color(0xFF0A0A1A)
@@ -59,6 +64,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaHome(
+    navController: NavController,
     aoClicarParaVoltar: () -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
@@ -112,10 +118,16 @@ fun TelaHome(
                     icon = { Icon(Icons.Default.Favorite, "Favoritos") },
                     label = { Text("Favoritos") }, selected = false, onClick = {}, colors = navColors
                 )
+
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.AutoAwesomeMotion, "Descobrir")},
+                    label = { Text("Descobrir")} , selected = false, onClick = {navController.navigate("descobrir")}, colors = navColors
+                )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.AccountCircle, "Perfil") },
                     label = { Text("Perfil") }, selected = false, onClick = {}, colors = navColors
                 )
+
             }
         },
         floatingActionButton = {
@@ -394,6 +406,120 @@ fun DialogAddEditAnime(
             }
         }
     )
+}
+
+@Composable
+fun TelaDescobrir(
+    homeViewModel: HomeViewModel = viewModel(),
+    descobrirViewModel: DescobrirViewModel = viewModel()
+) {
+    var busca by remember { mutableStateOf("") }
+    val resultados by descobrirViewModel.resultados.collectAsState()
+    val carregando by descobrirViewModel.carregando.collectAsState()
+    val erro by descobrirViewModel.erro.collectAsState()
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(Unit) {
+        descobrirViewModel.buscarAnimes("popular")
+    }
+
+    Column(modifier = Modifier.fillMaxSize().background(DarkBg).padding(16.dp)) {
+        OutlinedTextField(
+            value = busca,
+            onValueChange = { busca = it },
+            label = { Text("Buscar anime") },
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                IconButton(onClick = { if (busca.isNotBlank()) descobrirViewModel.buscarAnimes(busca)
+                    keyboardController?.hide() }) {
+                    Icon(Icons.Default.Search, "Buscar", tint = Purple)
+                }
+            }
+        )
+        Spacer(Modifier.height(12.dp))
+        when {
+            carregando -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Purple)
+            }
+            erro != null -> Text(erro ?: "", color = Red)
+            else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(resultados) { animeApi ->
+                    CardAnimeApi(
+                        animeApi = animeApi,
+                        onSalvar = {
+                            homeViewModel.inserirAnime(
+                                nome = animeApi.title,
+                                descricao = animeApi.synopsis ?: "",
+                                episodios = animeApi.episodes ?: 0,
+                                favorite = false,
+                                imageUrl = animeApi.images.jpg.imageUrl
+                            )
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CardAnimeApi(animeApi: AnimeApiDto, onSalvar: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = CardBg)
+    ) {
+        Row(modifier = Modifier.padding(12.dp)) {
+            AsyncImage(
+                model = animeApi.images.jpg.imageUrl,
+                contentDescription = animeApi.title,
+                modifier = Modifier.size(80.dp).clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(animeApi.title, color = TextPrimary, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text("${animeApi.episodes ?: "?"} ep · ⭐ ${animeApi.score ?: "-"}", color = TextMuted, fontSize = 12.sp)
+                Spacer(Modifier.height(6.dp))
+                TextButton(onClick = onSalvar, contentPadding = PaddingValues(0.dp)) {
+                    Text("Salvar na minha lista", color = Purple, fontSize = 13.sp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TelaLogin(aoLogar: () -> Unit, viewModel: LoginViewModel = viewModel()) {
+    var email by remember { mutableStateOf("") }
+    var senha by remember { mutableStateOf("") }
+    var modoCadastro by remember { mutableStateOf(false) }
+    val logado by viewModel.logado.collectAsState()
+    val erro by viewModel.erro.collectAsState()
+
+    LaunchedEffect(logado) { if (logado) aoLogar() }
+
+    Column(
+        modifier = Modifier.fillMaxSize().background(DarkBg).padding(24.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("🎌 AnimeCo", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary)
+        Spacer(Modifier.height(32.dp))
+        darkField("E-mail", email, keyboardType = KeyboardType.Email) { email = it }
+        Spacer(Modifier.height(12.dp))
+        darkField("Senha", senha) { senha = it }
+        erro?.let { Spacer(Modifier.height(8.dp)); Text(it, color = Red, fontSize = 13.sp) }
+        Spacer(Modifier.height(20.dp))
+        Button(
+            onClick = { if (modoCadastro) viewModel.cadastrar(email, senha) else viewModel.login(email, senha) },
+            colors = ButtonDefaults.buttonColors(containerColor = Purple),
+            modifier = Modifier.fillMaxWidth()
+        ) { Text(if (modoCadastro) "Criar conta" else "Entrar") }
+        TextButton(onClick = { modoCadastro = !modoCadastro }) {
+            Text(if (modoCadastro) "Já tenho conta" else "Criar nova conta", color = PurpleLight)
+        }
+    }
 }
 
 // ── Campo de texto com tema dark ──────────────────────────

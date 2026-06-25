@@ -5,8 +5,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-import com.example.princesa_disney.telas.TelaLogin
-
 @Composable
 fun AppNavegation() {
     // esse cara e nosso motorista
@@ -17,8 +15,10 @@ fun AppNavegation() {
         //mapear a rota
         composable("login") {
             TelaLogin(
-                aoClickEnterNavigation = {
-                    navController.navigate("main")
+                aoLogar = {
+                    navController.navigate("main") {
+                        popUpTo("login") { inclusive = true }
+                    }
                 }
             )
         }
@@ -26,11 +26,15 @@ fun AppNavegation() {
         // 4. Mapeando a rota "detalhes"
         composable("main") {
             TelaHome(
+                navController = navController,
                 aoClicarParaVoltar = {
-                    // Dizemos ao motorista para remover a tela atual da  pilha e voltar
-                    navController.popBackStack()
+                    navController.navigate("login")  {
+                        popUpTo("main") {inclusive = true}
+                    }
                 }
             )
         }
+
+        composable("descobrir") { TelaDescobrir() }
     }
 }

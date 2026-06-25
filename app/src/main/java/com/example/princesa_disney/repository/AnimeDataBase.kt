@@ -5,10 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.princesa_disney.entity.Anime
+import com.example.princesa_disney.entity.User
 
-@Database(entities = [Anime::class], version = 2) //primeira versao que estou fazendo
+@Database(entities = [Anime::class, User::class], version = 3, exportSchema = false)
 abstract class AnimeDataBase : RoomDatabase() {
     abstract fun animeDao(): AnimeDAO
+    abstract fun userDao(): UserDao
     companion object {
         private lateinit var instance: AnimeDataBase //construtor do nosso sistema
         private const val DATABASE_NAME = "anime_db"

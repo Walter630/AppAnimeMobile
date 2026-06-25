@@ -32,14 +32,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
         compose = true
         viewBinding = true
     }
 }
+
 
 dependencies {
     implementation(libs.androidx.activity.ktx)
@@ -63,12 +64,15 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.room:room-runtime:${libs.versions.room.get()}")
+    implementation("androidx.room:room-ktx:${libs.versions.room.get()}")
     implementation("androidx.fragment:fragment-ktx:1.7.1")
     implementation("com.google.android.material:material:1.12.0")
-    ksp("androidx.room:room-compiler:2.6.1")
+    ksp("androidx.room:room-compiler:${libs.versions.room.get()}")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
